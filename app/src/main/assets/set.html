@@ -1,0 +1,1741 @@
+﻿﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no"/>
+
+    <link rel="stylesheet" type="text/css" href="css/login.css">
+    <link rel="stylesheet" type="text/css" href="cropper/4.0.0/cropper.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="dist/cropper.js"></script>
+    <title>系统设置</title>
+
+    <style type="text/css">
+        .center_horizontal { margin: 0 auto; text-align: center; }
+        .fwq table { margin: 0 auto; }
+        #staticpanel table { margin: 0 auto; }
+        /*.fwq input { height: 32px; border-radius: 2px; outline: none; border-top-style: groove; border-right-style: groove; border-bottom-style: groove; border-left-style: groove; border: 1px solid #eaeaea; background: #dee7f0; padding: 3px 10px; width: 200px; }*/
+        .xjTable { /* margin-left: 15%; */ position: absolute; width: 48%; bottom: 153px; }
+        .xjTable table { margin: 0 auto; }
+        .xjTable input { height: 32px; border-radius: 2px; outline: none; border-top-style: groove; border-right-style: groove; border-bottom-style: groove; border-left-style: groove; border: 1px solid #eaeaea; padding: 6px 10px; width: 150px; }
+        .content-panel-left { width: calc(48% - 20px); height: calc(100% - 200px); float: left; margin: 20px; color: #5e5e5e; border: 1px solid #949494; border-radius: 10px; box-shadow: 1px 1px 1px #e8e8e8; }
+        .content-panel-right { width: calc(48% - 20px); height: calc(100% - 200px); float: right; margin: 20px; color: #5e5e5e; border: 1px solid #949494; border-radius: 10px; box-shadow: 1px 1px 1px #e8e8e8; }
+        img { max-width: 100%; }
+        .cropper-container img { max-height: 340px; max-width: 100%; }
+        .cropper-modal { opacity: 0; }
+        .cropper-face { opacity: 0.5; }
+        .cropper-view-box { outline: 3px solid red; outline-color: red; }
+        #btn_sq { width: 101px; height: 30px; font-size: 16px; margin-left: 40px; border-radius: 2px; border: #ddd 1px; background-color: black; color: #fff; }
+        #div_state { float: right; width: 260px; padding-top: 32px; height: 40px; }
+        .state_0 { color: red; }
+        .state_1 { color: #fff; }
+        .top_span { width: 50%; float: left; margin-top: 20px; }
+        table tr td { padding-top: 8px; float: left; width: 155px; text-align: left; padding-left: 16px; }
+        .loading { background: url("image/loading_red.gif") 50% no-repeat #fff; width: 100%; height: 100%; overflow: hidden; position: fixed; left: 0; top: 0; z-index: 100; }
+
+        .half-row { overflow: hidden; }
+        .half-row .half-item { width: 50%; float: left; text-align: center; }
+        .half-item .title-div { font-size: 20px; margin-top: 15px; margin-bottom: 15px; height: 24px; line-height: 24px; }
+        .cut-body { border: solid 1px #bababa; border-radius: 10px; }
+        .img-div { min-height: 340px; border-top-left-radius: 10px; border-top-right-radius: 10px; }
+        .img-div img { width: 100%; border-top-left-radius: 10px; border-top-right-radius: 10px; }
+        .form-div { padding: 10px 0 18px 0; }
+        td.w120 { text-align: right; }
+        .w120 { width: 120px; }
+        .w160 { width: 160px; }
+        .form-input { display: block; width: 100%; height: 34px; padding: 6px 12px; font-size: 14px; line-height: 1.42857143; color: #555; background-color: #fff; background-image: none; border: 1px solid #ccc; border-radius: 4px; transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s; }
+        .form-input[readonly="readonly"] { background-color: #e8e8e8; }
+        .form-div table { margin: 0 auto; line-height: 34px; }
+
+        @media (max-width: 600px) {
+            #setTitle { display: none; }
+        }
+
+        @media (max-width: 1170px) {
+            .half-row .half-item { width: 100%; }
+            .w160 { width: 160px !important; }
+        }
+
+        @media (max-width: 1440px) {
+            .w160 { width: 100px; }
+        }
+
+
+
+    </style>
+
+
+    <script>
+        var allcookies = document.cookie;
+        if(allcookies.length==0){
+            alert("请先登录")
+           document.location = "/"
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/onFacepassAuth",
+            success: function (data) {
+                var obj = $.parseJSON(data.data);
+                var authorized = obj.isAuthorized;
+                if (authorized == "true") {
+                    $(".state").text("已授权").removeClass("state_0").addClass("state_1");
+                } else {
+                    $(".state").text("未授权").addClass("state_0").removeClass("state_1");
+                }
+            }
+
+        });
+
+
+
+
+
+
+
+
+    </script>
+
+</head>
+
+
+<body class="main_body" style="overflow: hidden;">
+<form>
+    <div class="header">
+        <div style="float: left; width: 100px;">
+            <img src="image/icon02.png" style="margin-left:20px;margin-top:10px;height:60px;">
+        </div>
+
+        <div id="setTitle" style="float: left; vertical-align: middle;width:240px;">
+            <label style="width:240px;font-size: 2.0rem"> 全息终端配置</label>
+        </div>
+        <div id="div_state">
+            <span class="state state_0">未授权</span>
+            <input type="button" id="btn_sq" value="授&nbsp;&nbsp;&nbsp;&nbsp;权">
+        </div>
+    </div>
+    <div class="content-left">
+
+        <ul>
+            <li>
+                <input id="tab3" type="radio" name="tab" checked>
+                <label for="tab3">人脸识别区配置</label>
+                <div class="content1">
+                    <div class="half-row">
+                        <div class="half-item">
+                            <div style="padding:20px;">
+                                <div class="title-div">人脸划区 1</div>
+                                <div class="cut-body">
+                                    <div class="img-div">
+                                        <img id="img-face1" src="image/imgback.jpg">
+                                    </div>
+                                    <div class="form-div">
+                                        <table>
+                                            <tr>
+                                                <td class="w120"><span>人脸划区坐标： </span></td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="faceX1" id="faceX1"/>
+                                                </td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="faceY1" id="faceY1"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="w120"><span>人脸划区宽高： </span></td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="faceW1" id="faceW1"/>
+                                                </td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="faceH1" id="faceH1"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="half-item">
+                            <div style="padding:20px;">
+                                <div class="title-div">人脸划区 2</div>
+                                <div class="cut-body">
+                                    <div class="img-div">
+                                        <img id="img-face2" src="image/imgback.jpg">
+                                    </div>
+                                    <div class="form-div">
+                                        <table>
+                                            <tr>
+                                                <td class="w120"><span>人脸划区坐标： </span></td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="faceX2" id="faceX2"/>
+                                                </td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="faceY2" id="faceY2"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="w120"><span>人脸划区宽高： </span></td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="faceW2" id="faceW2"/>
+                                                </td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="faceH2" id="faceH2"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <input type="button" id="facesubmit" value="保&nbsp;&nbsp;存">
+                </div>
+            </li>
+            <li>
+                <input id="tab4" type="radio" name="tab">
+                <label for="tab4">车牌识别区配置</label>
+                <div class="content1">
+                    <div class="half-row">
+                        <div class="half-item">
+                            <div style="padding:20px;">
+                                <div class="title-div">车牌划区 1</div>
+                                <div class="cut-body">
+                                    <div class="img-div">
+                                        <img id="img-car1" src="image/imgback.jpg">
+                                    </div>
+                                    <div class="form-div">
+                                        <table>
+                                            <tr>
+                                                <td class="w120"><span>车牌划区坐标： </span></td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="carX1" id="carX1"/>
+                                                </td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="carY1" id="carY1"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="w120"><span>车牌划区宽高： </span></td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="carW1" id="carW1"/>
+                                                </td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="carH1" id="carH1"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="w120"><span>是否上传： </span></td>
+                                                <td>
+                                                    <select class="form-input" id="carSend1">
+                                                        <option value="1">上传</option>
+                                                        <option value="2">不上传</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="half-item">
+                            <div style="padding:20px;">
+                                <div class="title-div">车牌划区 2</div>
+                                <div class="cut-body">
+                                    <div class="img-div">
+                                        <img id="img-car2" src="image/imgback.jpg">
+                                    </div>
+                                    <div class="form-div">
+                                        <table>
+                                            <tr>
+                                                <td class="w120"><span>车牌划区坐标： </span></td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="carX2" id="carX2"/>
+                                                </td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="carY2" id="carY2"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="w120"><span>车牌划区宽高： </span></td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="carW2" id="carW2"/>
+                                                </td>
+                                                <td class="w160">
+                                                    <input class="form-input" readonly="readonly"
+                                                           type="number" name="carH2" id="carH2"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="w120"><span>是否上传： </span></td>
+                                                <td>
+                                                    <select class="form-input" id="carSend2">
+                                                        <option value="1">上传</option>
+                                                        <option value="2">不上传</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <input type="button" id="carsubmit" value="保&nbsp;&nbsp;存">
+                </div>
+            </li>
+            <li>
+                <input id="tab1" type="radio" name="tab">
+                <label for="tab1">服务器配置</label>
+                <div class="content1">
+                    <div class="form-div" style="margin-top:20px;">
+                        <table>
+                            <tr>
+                                <td class="w120"><span>设备编号：</span></td>
+                                <td class="w160">
+                                    <input class="form-input" type="text" name="deviceId"
+                                           id="deviceId" required="required"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w120"><span>出/入口：</span></td>
+                                <td class="w160">
+                                    <select class="form-input" id="exitNo">
+                                        <option value="0">出口</option>
+                                        <option value="1">入口</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="w120"><span>是否有网关：</span></td>
+                                <td class="w160">
+                                    <select class="form-input" id="has-gateway">
+                                        <option value="1">有</option>
+                                        <option value="2">没有</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <tr id="serverIpTr">
+                                <td class="w120"><span>服务器IP： </span></td>
+                                <td class="w160">
+                                    <input class="form-input" type="text" name="serverIp"
+                                           id="serverIp"
+                                           autocomplete="off"/>
+                                </td>
+                            </tr>
+                            <tr id="serverPortTr">
+                                <td class="w120"><span>服务器端口：</span></td>
+                                <td class="w160">
+                                    <input class="form-input" type="text" name="serverPort"
+                                           id="serverPort"/>
+                                </td>
+                            </tr>
+
+
+                            <tr>
+                                <td class="w120"><span>主/辅设备：</span></td>
+                                <td class="w160">
+                                    <select class="form-input" id="deviceType">
+                                        <option value="1">主设备</option>
+                                        <option value="2">辅设备</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr id="mainIpTr" style="display:none;">
+                                <td class="w120"><span>主设备IP：</span></td>
+                                <td class="w160">
+                                    <input class="form-input" type="text" name="mainIp" id="mainIp"
+                                           maxlength="30"
+                                           required="required"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="half-row">
+                        <div class="half-item">
+                            <div style="padding:20px 10px 20px 20px;">
+                                <div class="cut-body">
+                                    <div class="half-row">
+                                        <div class="half-item">
+                                            <div class="form-div">
+                                                <table>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头账号：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" type="text"
+                                                                   name="cameraAccount1"
+                                                                   id="cameraAccount1"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头密码：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input"
+                                                                   type="password"
+                                                                   name="cameraPassword1"
+                                                                   id="cameraPassword1"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头型号：</span></td>
+                                                        <td class="w160">
+                                                            <select class="form-input"
+                                                                    id="cameraType1">
+                                                                <option value="1">海康</option>
+                                                                <option value="2">大华</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头地址：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" type="text"
+                                                                   name="cameraUrl1" id="cameraUrl1"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>最小人脸尺寸：</span></td>
+                                                        <td class="w160">
+                                                            <select class="form-input"
+                                                                    id="faceSize1">
+                                                                <option value="50">50</option>
+                                                                <option value="60">60</option>
+                                                                <option value="70">70</option>
+                                                                <option value="80">80</option>
+                                                                <option value="90">90</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="half-item">
+                                            <div class="form-div">
+                                                <table>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头账号：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" type="text"
+                                                                   name="cameraAccount2"
+                                                                   id="cameraAccount2"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头密码：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input"
+                                                                   type="password"
+                                                                   name="cameraPassword2"
+                                                                   id="cameraPassword2"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头型号：</span></td>
+                                                        <td class="w160">
+                                                            <select class="form-input"
+                                                                    id="cameraType2">
+                                                                <option value="1">海康</option>
+                                                                <option value="2">大华</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头地址：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" type="text"
+                                                                   name="cameraUrl2" id="cameraUrl2"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>最小人脸尺寸：</span></td>
+                                                        <td class="w160">
+                                                            <select class="form-input"
+                                                                    id="faceSize2">
+                                                                <option value="50">50</option>
+                                                                <option value="60">60</option>
+                                                                <option value="70">70</option>
+                                                                <option value="80">80</option>
+                                                                <option value="90">90</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="title-div" style="color:#777;">
+                                        提示：建议200W相机设置50,400W相机设置70
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="half-item">
+                            <div style="padding:20px 10px 20px 20px;">
+                                <div class="cut-body">
+                                    <div class="half-row">
+                                        <div class="half-item">
+                                            <div class="form-div">
+                                                <table>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头账号：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" type="text"
+                                                                   name="cameraAccount3"
+                                                                   id="cameraAccount3"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头密码：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input"
+                                                                   type="password"
+                                                                   name="cameraPassword3"
+                                                                   id="cameraPassword3"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头型号：</span></td>
+                                                        <td class="w160">
+                                                            <select class="form-input"
+                                                                    id="cameraType3">
+                                                                <option value="1">海康</option>
+                                                                <option value="2">大华</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头地址：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" type="text"
+                                                                   name="cameraUrl3" id="cameraUrl3"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120">
+                                                            <div style="height:34px;"></div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="half-item">
+                                            <div class="form-div">
+                                                <table>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头账号：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" type="text"
+                                                                   name="cameraAccount4"
+                                                                   id="cameraAccount4"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头密码：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input"
+                                                                   type="password"
+                                                                   name="cameraPassword4"
+                                                                   id="cameraPassword4"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头型号：</span></td>
+                                                        <td class="w160">
+                                                            <select class="form-input"
+                                                                    id="cameraType4">
+                                                                <option value="1">海康</option>
+                                                                <option value="2">大华</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>摄像头地址：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" type="text"
+                                                                   name="cameraUrl4" id="cameraUrl4"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="title-div">
+                                        &nbsp;
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="button" id="serversubmit"
+                           value="保&nbsp;&nbsp;存&nbsp;&nbsp;并&nbsp;&nbsp;重&nbsp;&nbsp;启">
+                </div>
+            </li>
+            <li>
+                <input id="tab2" type="radio" name="tab">
+                <label for="tab2">设备配置</label>
+                <div class="content1">
+                    <br/><br/><br/><br/>
+                    <div class="radio-panel" style="margin: 0 auto;">
+                        <label class="my-label">
+                            <input type="radio" name="iptype" checked="checked" value="static"/>&nbsp;静态地址
+                        </label>
+                        <label class="my-label">
+                            <input type="radio" name="iptype" value="dynamic"/>&nbsp;动态地址
+                        </label>
+                        <br/>
+                        <br/>
+                    </div>
+                    <div class="" id="staticpanel">
+                        <table>
+                            <tr>
+                                <td class="w120"><span>设备IP：</span></td>
+                                <td class="w160">
+                                    <input class="form-input" type="text" name="deviceIp"
+                                           id="deviceIp"
+                                           required="required">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w120"><span>设备网关：</span></td>
+                                <td class="w160">
+                                    <input class="form-input" type="text" name="deviceGateway"
+                                           id="deviceGateway"
+                                           autocomplete="off" required="required">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w120"><span>子网掩码： </span></td>
+                                <td class="w160">
+                                    <input class="form-input" type="text" name="deviceNetmask"
+                                           id="deviceNetmask"
+                                           maxlength="20" required="required">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w120"><span>DNS1：</span></td>
+                                <td class="w160">
+                                    <input class="form-input" type="text" name="dns1" id="dns1"
+                                           maxlength="20"
+                                           required="required">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w120"><span>DNS2：</span></td>
+                                <td class="w160">
+                                    <input class="form-input" type="text" name="dns2" id="dns2"
+                                           maxlength="20"
+                                           required="required">
+                                </td>
+                            </tr>
+
+                        </table>
+                        <!-- <span>设备IP：</span> <input type="number" name="deviceIp" id="deviceIp" required="required"><br /><br />
+                        <span>设备网关： </span><input type="text" name="deviceGateway" id="deviceGateway" autocomplete="off" required="required"><br /><br />
+                        <span>子网掩码：</span><input type="number" name="deviceNetmask" id="deviceNetmask" maxlength="5" required="required"><br /><br />
+                        <span>DNS1：</span><input type="password" name="dns1" id="dns1"  maxlength="20" required="required"><br /><br />
+                        <span>DNS2：</span><input type="text" name="dns2" id="dns2"  maxlength="20" required="required"><br /><br /> -->
+                    </div>
+                    <br/><br/>
+                    <input type="button" id="devicesubmit" value="保&nbsp;&nbsp;存">
+                </div>
+            </li>
+            <li>
+                <input id="tab5" type="radio" name="tab">
+                <label for="tab5">信息录入</label>
+                <div class="content1">
+                    <div class="half-row">
+                        <div class="half-item">
+                            <div style="padding:20px 10px 20px 20px;">
+                                <div class="cut-body">
+                                    <div class="half-row">
+                                        <div class="half-item">
+                                            <div class="form-div">
+                                                <table>
+
+                                                    <tr>
+                                                        <td class="w120"><span>照片：</span></td>
+                                                        <td class="w160">
+                                                            <input type="file" name="face-file"
+                                                                   id="face-file"
+                                                                   accept="image/jpg" required
+                                                                   onchange="fileReader(this)"/>
+                                                        </td>
+                                                        <td class="w160">
+                                                            <img id="img" src=""/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>姓名：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input"
+                                                                   name="face-name" id="face-name"
+                                                                   type="text" placeholder="姓名"
+                                                                   maxlength="10" required/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>身份证号码： </span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input"
+                                                                   name="face-idcard"
+                                                                   id="face-idcard"
+                                                                   type="text" placeholder="身份证号码"
+                                                                   maxlength="18" required/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>类型：</span></td>
+                                                        <td class="w160">
+                                                            <select class="form-input"
+                                                                    id="face-flag">
+                                                                <option value="1">白名单</option>
+                                                                <option value="2">黑名单</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <br/><br/>
+                                                <input type="button" onclick="faceAdd()"
+                                                       value="人&nbsp;&nbsp;脸&nbsp;&nbsp;录&nbsp;&nbsp;入">
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="half-item">
+                            <div style="padding:20px 10px 20px 20px;">
+                                <div class="cut-body">
+                                    <div class="half-row">
+                                        <div class="half-item">
+                                            <div class="form-div">
+                                                <table>
+
+                                                    <tr>
+                                                        <td class="w120"><span>车牌号：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" name="car-num"
+                                                                   id="car-num"
+                                                                   type="text" placeholder="请输入车牌号"
+                                                                   maxlength="10"
+                                                                   required/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>品牌： </span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input"
+                                                                   name="car-pinpai" id="car-pinpai"
+                                                                   type="text" placeholder="请输入车品牌"
+                                                                   maxlength="18"
+                                                                   required/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>类型：</span></td>
+                                                        <td class="w160">
+                                                            <select class="form-input"
+                                                                    id="car-flag">
+                                                                <option value="1">白名单</option>
+                                                                <option value="2">黑名单</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <br/><br/>
+                                                <input type="button" onclick="plateAdd()"
+                                                       value="车&nbsp;&nbsp;牌&nbsp;&nbsp;录&nbsp;&nbsp;入">
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+            <li>
+                <input id="tab6" type="radio" name="tab">
+                <label for="tab6">信息查询</label>
+                <div class="content1">
+                    <div class="half-row">
+                        <div class="half-item">
+                            <div style="padding:20px 10px 20px 20px;">
+                                <div class="cut-body">
+                                    <div class="half-row">
+                                        <div class="half-item">
+                                            <div class="form-div">
+                                                <table>
+
+                                                    <tr>
+                                                        <td class="w120"><span>姓名：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" name="name"
+                                                                   id="name"
+                                                                   type="text" placeholder="姓名"
+                                                                   maxlength="10"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>身份证号码： </span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" name="idcard"
+                                                                   id="idcard"
+                                                                   type="text" placeholder="身份证号码"
+                                                                   maxlength="18"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>类型：</span></td>
+                                                        <td class="w160">
+                                                            <select class="form-input" id="flag1">
+                                                                <option value="0">全部</option>
+                                                                <option value="1">白名单</option>
+                                                                <option value="2">黑名单</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <br/><br/>
+                                                <input type="button" onclick="faceQuery()"
+                                                       value="人&nbsp;&nbsp;脸&nbsp;&nbsp;查&nbsp;&nbsp;询">
+                                                <div id="faceResult" style="margin:50px">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="half-item">
+                            <div style="padding:20px 10px 20px 20px;">
+                                <div class="cut-body">
+                                    <div class="half-row">
+                                        <div class="half-item">
+                                            <div class="form-div">
+                                                <table>
+
+                                                    <tr>
+                                                        <td class="w120"><span>车牌号：</span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" name="num"
+                                                                   id="num"
+                                                                   type="text" placeholder="请输入车牌号"
+                                                                   maxlength="10"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>品牌： </span></td>
+                                                        <td class="w160">
+                                                            <input class="form-input" name="pinpai"
+                                                                   id="pinpai"
+                                                                   type="text" placeholder="请输入车品牌"
+                                                                   maxlength="18"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w120"><span>类型：</span></td>
+                                                        <td class="w160">
+                                                            <select class="form-input" id="flag2">
+                                                                <option value="0">全部</option>
+                                                                <option value="1">白名单</option>
+                                                                <option value="2">黑名单</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <br/><br/>
+                                                <input type="button" onclick="plateQuery()"
+                                                       value="车&nbsp;&nbsp;牌&nbsp;&nbsp;查&nbsp;&nbsp;询">
+                                                <div id="plateResult" style="margin:50px"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <!--遮罩层-->
+        <div class="loading" id="load"></div>
+
+        <script type="text/javascript">
+            //var host = 'http://' + window.location.hostname;
+            var host='http://192.168.2.71:3288';
+
+
+            $(function () {
+                setTimeout(function () {
+                    $("#load").hide();
+                }, 1000);
+
+                $('#deviceType').change(function () {
+                    if (this.value == '1') {
+                        $("#mainIpTr").hide();
+                    } else if (this.value == '2') {
+                        $("#mainIpTr").show();
+                    }
+                });
+                $('#has-gateway').change(function () {
+                    if (this.value == '1') {
+                        $("#serverIpTr").show();
+                        $("#serverPortTr").show();
+                    } else if (this.value == '2') {
+                        $("#serverIpTr").hide();
+                        $("#serverPortTr").hide();
+                    }
+                });
+
+                $('input[type=radio][name=iptype]').change(function () {
+                    if (this.value == 'static') {
+                        $("#staticpanel").show();
+                    }
+                    else if (this.value == 'dynamic') {
+                        $("#staticpanel").hide();
+                    }
+                });
+
+                $("#serversubmit").click(function () {
+                    //alert(1);
+                    serversubmit();
+                });
+                $("#devicesubmit").click(function () {
+                    //alert(1);
+                    devicesubmit();
+                });
+                $("#facesubmit").click(function () {
+                    facesubmit();
+                });
+                $("#carsubmit").click(function () {
+                    carsubmit();
+                });
+
+            });
+
+            function isValidIP(ip) {
+                var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+                return reg.test(ip);
+            }
+
+            //人脸识别区提交
+            function facesubmit() {
+                //人脸1
+                var face_x1 = $("#faceX1").val(); //x起点
+                var face_y1 = $("#faceY1").val(); //y点
+                var face_w1 = $("#faceW1").val(); //像素宽
+                var face_h1 = $("#faceH1").val(); //像素高
+                //人脸2
+                var face_x2 = $("#faceX2").val(); //x起点
+                var face_y2 = $("#faceY2").val(); //y点
+                var face_w2 = $("#faceW2").val(); //像素宽
+                var face_h2 = $("#faceH2").val(); //像素高
+
+                // 此处添加调用后台方法
+                $.ajax({
+                    url: "/setFaceOCR",
+                    type: "POST",
+                    async: false,
+                    data: {
+                        faceX1: face_x1,
+                        faceY1: face_y1,
+                        faceW1: face_w1,
+                        faceH1: face_h1,
+                        faceX2: face_x2,
+                        faceY2: face_y2,
+                        faceW2: face_w2,
+                        faceH2: face_h2
+                    },
+                    success: function (result) {
+                        alert("识别区配置成功");
+                    }
+                });
+            };
+
+            //车辆识别区提交3288
+            function carsubmit() {
+                //车辆1
+                var car_x1 = $("#carX1").val(); //x起点
+                var car_y1 = $("#carY1").val(); //y点
+                var car_w1 = $("#carW1").val(); //像素宽
+                var car_h1 = $("#carH1").val(); //像素高
+                var carSend1 = $("#carSend1").val();
+
+                //车辆2
+                var car_x2 = $("#carX2").val(); //x起点
+                var car_y2 = $("#carY2").val(); //y点
+                var car_w2 = $("#carW2").val(); //像素宽
+                var car_h2 = $("#carH2").val(); //像素高
+                var carSend2 = $("#carSend2").val();
+
+
+                $.ajax({
+                    url: host + "/setOCR",
+                    type: "POST",
+                    async: false,
+                    data: {
+                        carX1: car_x1,
+                        carY1: car_y1,
+                        carH1: car_h1,
+                        carW1: car_w1,
+                        carSend1: carSend1,
+                        carX2: car_x2,
+                        carY2: car_y2,
+                        carH2: car_h2,
+                        carW2: car_w2,
+                        carSend2: carSend2
+                    },
+                    success: function (result) {
+                        alert("识别区配置成功");
+                    },
+					error:function(){
+						alert("识别区配置出错");
+
+                    }
+                });
+            };
+
+
+            function serversubmit() {
+                var deviceId = $("#deviceId").val();
+                var exitNo = $("#exitNo").val();
+                 var hasGateway = $("#has-gateway").val();
+                var serverIp = $("#serverIp").val();
+                var serverPort = $("#serverPort").val();
+                var deviceType = $("#deviceType").val();
+                var mainIp = $("#mainIp").val();
+
+                var cameraAccount1 = $('#cameraAccount1').val();
+                var cameraPassword1 = $('#cameraPassword1').val();
+                var cameraType1 = $('#cameraType1').val();
+                var cameraUrl1 = $('#cameraUrl1').val();
+                var faceSize1 = $('#faceSize1').val();
+
+                var cameraAccount2 = $('#cameraAccount2').val();
+                var cameraPassword2 = $('#cameraPassword2').val();
+                var cameraType2 = $('#cameraType2').val();
+                var cameraUrl2 = $('#cameraUrl2').val();
+                var faceSize2 = $('#faceSize2').val();
+
+                var cameraAccount3 = $('#cameraAccount3').val();
+                var cameraPassword3 = $('#cameraPassword3').val();
+                var cameraType3 = $('#cameraType3').val();
+                var cameraUrl3 = $('#cameraUrl3').val();
+
+                var cameraAccount4 = $('#cameraAccount4').val();
+                var cameraPassword4 = $('#cameraPassword4').val();
+                var cameraType4 = $('#cameraType4').val();
+                var cameraUrl4 = $('#cameraUrl4').val();
+
+
+                if (!isValidIP(serverIp)) {
+                    alert("IP地址格式输入错误！");
+                    return false;
+                };
+
+                // 此处添加调用后台方法
+                $.ajax({
+                    url: "/setServer",
+                    type: "POST",
+                    async: false,
+                    data: {
+                        deviceId: deviceId,
+                        exitNo: exitNo,
+                        hasGateway:hasGateway,
+                        serverIp: serverIp,
+                        serverPort: serverPort,
+                        deviceType: deviceType,
+                        mainIp: mainIp,
+
+                        faceServerAccount1: cameraAccount1,
+                        faceServerPassword1: cameraPassword1,
+                        faceUrlType1: cameraType1,
+                        faceUrl1: cameraUrl1,
+                        faceSize1: faceSize1,
+
+                        faceServerAccount2: cameraAccount2,
+                        faceServerPassword2: cameraPassword2,
+                        faceUrlType2: cameraType2,
+                        faceUrl2: cameraUrl2,
+                        faceSize2: faceSize2,
+
+                        carServerAccount1: cameraAccount3,
+                        carServerPassword1: cameraPassword3,
+                        carUrlType1: cameraType3,
+                        carUrl1: cameraUrl3,
+
+                        carServerAccount2: cameraAccount4,
+                        carServerPassword2: cameraPassword4,
+                        carUrlType2: cameraType4,
+                        carUrl2: cameraUrl4
+                    },
+                    success: function (result) {
+                        alert("修改成功");
+                    },
+                    error: function () {
+                        alert("保存成功，请30秒后刷新，重新配置识别区");
+                        window.location.reload();
+                    }
+                });
+                //设置3288服务器数据，跨域
+                $.ajax({
+                    url: host+"/setPlateServer",
+                    type: "POST",
+                    async: false,
+                    data: {
+
+                        account1: cameraAccount3,
+                        password1: cameraPassword3,
+                        urlType1: cameraType3,
+                        videoUrl1: cameraUrl3,
+
+                        account2: cameraAccount4,
+                        password2: cameraPassword4,
+                        urlType2: cameraType4,
+                        videoUrl2: cameraUrl4
+
+                    },
+                    success: function (result) {
+                        alert("修改成功");
+                    },
+                    error: function () {
+                        alert("保存成功，请30秒后刷新，重新配置识别区");
+                        window.location.reload();
+                    }
+                });
+
+            };
+
+            function devicesubmit() {
+
+                var type = $('input[type=radio][name=iptype]:checked').val();
+                var deviceIp = $("#deviceIp").val();
+                var deviceGateway = $("#deviceGateway").val();
+                var deviceNetmask = $("#deviceNetmask").val();
+                var dns1 = $("#dns1").val();
+                var dns2 = $("#dns2").val();
+                if (type == 'static') {
+                    if (!isValidIP(deviceIp)) {
+                        alert("IP地址格式输入错误！");
+                        return;
+
+                    } else
+                        if (deviceGateway == "") {
+                            alert("设备网关格式输入错误！");
+                            return;
+                        } else
+                            if (deviceNetmask == "") {
+                                alert("子网掩码格式输入错误！");
+                                return;
+                            } else
+                                if (dns1 == "") {
+                                    alert("DNS1格式输入错误！");
+                                    return;
+                                } else
+                                    if (dns2 == "") {
+                                        alert("DNS2格式输入错误！");
+                                        return;
+                                    }
+                    // 此处添加调用后台方法
+
+                    $.ajax({
+                        url: "/setDevice",
+                        type: "POST",
+                        async: false,
+                        data: {
+                            type: 2,
+                            localIpAddress: deviceIp,
+                            localNetmask: deviceNetmask,
+                            localGateway: deviceGateway,
+                            localDns1: dns1,
+                            localDns2: dns2
+                        },
+                        success: function (result) {
+                            alert("修改成功，请登录新IP进行配置");
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        url: "/setDevice",
+                        type: "POST",
+                        async: false,
+                        data: {
+                            type: 1
+                        },
+                        success: function (result) {
+                            alert("保存成功");
+                        }
+                    });
+                }
+            }
+
+            //人脸录入
+            function faceAdd(){
+                 var file = document.getElementById("face-file").files[0];
+                    var name = $.trim($('#face-name').val());
+                    var idcard = $.trim($('#face-idcard').val());
+                    var flag=$('#face-flag').val();
+                    console.log("addsubmit"+flag);
+                    var formData = new FormData();
+                    formData.append("file",file);
+                    formData.append("name", name);
+                    formData.append("idcard", idcard);
+                    formData.append("flag", flag);
+                    $.ajax({
+                        url: "/faceIn",
+                        type: "POST",
+                        async: false,
+                        data: formData,
+                        contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+                        processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+                        dataType: 'json',//这里是返回类型，一般是json,text等
+                        clearForm: true,//提交后是否清空表单数据
+                        success: function (result) {
+                            alert(result.data);
+                        }
+                    });
+            }
+            //车牌录入
+            function plateAdd(){
+                 var carnum = $.trim($('#car-num').val());
+                    var pinpai = $.trim($('#car-pinpai').val());
+                    var flag=$('#car-flag').val();
+                    $.ajax({
+                        url: "/plateIn",
+                        type: "POST",
+                        async: false,
+                        data: {
+                            carnum:carnum,
+                            pinpai:pinpai,
+                            flag:flag
+                        },
+                        dataType: 'json',//这里是返回类型，一般是json,text等
+                        clearForm: true,//提交后是否清空表单数据
+                        success: function (result) {
+                            alert(result.data);
+                        }
+                    });
+            }
+
+            //人脸查询
+            function faceQuery(){
+                var name = $.trim($('#name').val());
+                var idcard = $.trim($('#idcard').val());
+                var flag=$('#flag1').val();
+                console.log("addsubmit"+flag);
+
+                $.ajax({
+                    url: "/faceQuery",
+                    type: "POST",
+                    async: false,
+                    data: {
+                         name:name,
+                         idcard:idcard,
+                         flag:flag
+                    },
+                    dataType: 'json',//这里是返回类型，一般是json,text等
+                    clearForm: true,//提交后是否清空表单数据
+                    success: function (result) {
+                        var datas=JSON.parse(result.data);
+                        console.log(datas);
+
+                    }
+                });
+            }
+
+             //车牌查询
+            function plateQuery(){
+                var carnum = $.trim($('#num').val());
+                var pinpai = $.trim($('#pinpai').val());
+                var flag=$('#flag2').val();
+                $.ajax({
+                    url: "/plateQuery",
+                    type: "POST",
+                    async: false,
+                    data: {
+                        carnum:carnum,
+                        pinpai:pinpai,
+                        flag:flag
+                    },
+                    dataType: 'json',//这里是返回类型，一般是json,text等
+                    clearForm: true,//提交后是否清空表单数据
+                    success: function (result) {
+                        alert(result.data);
+                    }
+                });
+            }
+
+
+
+
+
+        </script>
+    </div>
+    <script>
+            var wid, hei, data_face1, data_face2,data_car1, data_car2, maxXs = 2000000;//
+            var  bl;
+            var cropper_face;
+            var a1, a2,b1,b2;
+            $(function () {
+                initList();
+                faceImgInit();
+                carImgInit();
+                console.log(333);
+                $("#btn_sq").click(function () {
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/onFacepassAuth",
+                        success: function (data) {
+                            var obj = $.parseJSON(data.data);
+                            var authorized = obj.isAuthorized;
+                            if (authorized == "true") {
+                                $(".state").text("已授权").removeClass("state_0").addClass("state_1");
+                                alert("授权成功!");
+                            } else {
+                                $(".state").text("未授权").addClass("state_0").removeClass("state_1");
+                                alert("授权失败!");
+                            }
+
+                        }
+
+                    });
+
+                });
+
+            });
+
+            function initList() {
+                $.getJSON("/getSet", function (data, status) {
+                    var obj = $.parseJSON(data.data);
+                    $("#deviceId").val(obj.deviceId);
+                    $("#exitNo").val(obj.exitNo);
+                    $("#has-gateway").val(obj.hasGateway);
+
+                    $("#serverIp").val(obj.serverIp);
+                    $("#serverPort").val(obj.serverPort);
+
+                    $("#cameraAccount1").val(obj.faceServerAccount1);
+                    $("#cameraPassword1").val(obj.faceServerPassword1);
+                    $("#cameraUrl1").val(obj.faceUrl1);
+                    $("#cameraType1").val(obj.faceUrlType1);
+                    $("#faceSize1").val(obj.faceSize1);
+
+                    $("#cameraAccount2").val(obj.faceServerAccount2);
+                    $("#cameraPassword2").val(obj.faceServerPassword2);
+                    $("#cameraUrl2").val(obj.faceUrl2);
+                    $("#cameraType2").val(obj.faceUrlType2);
+                    $("#faceSize2").val(obj.faceSize2);
+
+
+
+                    $("#faceX1").val(obj.faceX1);
+                    $("#faceY1").val(obj.faceY1);
+                    $("#faceW1").val(obj.faceW1);
+                    $("#faceH1").val(obj.faceH1);
+                    $("#faceX2").val(obj.faceX2);
+                    $("#faceY2").val(obj.faceY2);
+                    $("#faceW2").val(obj.faceW2);
+                    $("#faceH2").val(obj.faceH2);
+
+
+                    a1 = new Array(obj.faceX1, obj.faceY1, obj.faceW1, obj.faceH1, obj.faceXSW1);//obj.carXSW  像素宽  例子：1920
+                    a2 = new Array(obj.faceX2, obj.faceY2, obj.faceW2, obj.faceH2, obj.faceXSW2);
+
+                    $("#deviceIp").val(obj.localIpAddress);
+                    $("#deviceNetmask").val(obj.localNetmask);
+                    $("#deviceGateway").val(obj.localGateway);
+                    $("#dns1").val(obj.localDns1);
+                    $("#dns2").val(obj.localDns2);
+
+                    $("#deviceType").val(obj.deviceType);
+                    console.log(obj.deviceType + "+++" + obj.mainIp);
+                    $("#mainIp").val(obj.mainIp);
+                    if (obj.deviceType == "2") {
+                        $("#mainIpTr").show();
+
+                    } else {
+                        $("#mainIpTr").hide();
+                    }
+
+                    if (obj.hasGateway == "1") {
+                       $("#serverIpTr").show();
+                        $("#serverPortTr").show();
+                    } else {
+                        $("#serverIpTr").hide();
+                        $("#serverPortTr").hide();
+                    }
+                });
+
+                 // 此处添加调用3288后台方法
+                $.ajax({
+                    url: host + "/getPlateSet",
+                    type: "GET",
+                    async: false,
+                    success: function (result) {
+                      var obj = $.parseJSON(result.data);
+                      $("#cameraAccount3").val(obj.server1Account);
+                      $("#cameraPassword3").val(obj.server1Password);
+                      $("#cameraUrl3").val(obj.video1Url);
+                      $("#cameraType3").val(obj.url1Type);
+
+                      $("#cameraAccount4").val(obj.server2Account);
+                      $("#cameraPassword4").val(obj.server2Password);
+                      $("#cameraUrl4").val(obj.video2Url);
+                      $("#cameraType4").val(obj.url2Type);
+
+                      $("#carX1").val(obj.carX1);
+                      $("#carY1").val(obj.carY1);
+                      $("#carW1").val(obj.carW1);
+                      $("#carH1").val(obj.carH1);
+                      $("#carX2").val(obj.carX2);
+                      $("#carY2").val(obj.carY2);
+                      $("#carW2").val(obj.carW2);
+                      $("#carH2").val(obj.carH2);
+                      $("#carSend1").val(obj.car1_isSend);
+                      $("#carSend2").val(obj.car2_isSend);
+
+                      b1 = new Array(obj.carX1, obj.carY1, obj.carW1, obj.carH1, obj.carXSW1);//obj.carXSW  像素宽  例子：1920
+                      b2 = new Array(obj.carX2, obj.carY2, obj.carW2, obj.carH2, obj.carXSW2);
+
+
+                    },
+                    error: function () {
+                        alert("数据请求失败");
+
+                    }
+
+                });
+
+            }
+
+
+            //widthNum:获取的图片的像素宽
+            function initImgQY(id, widthNum, data_xs) {
+                if (widthNum == null || widthNum == undefined || widthNum == 0)
+                    widthNum = 1920
+                var wid = $(id).parent().find(".cropper-canvas").width();//画布的宽度
+                var bl = widthNum / wid;
+                console.log("initImgQY中比例是===" + bl);
+                //2 获取图片中的比例,把李的数据转换为html中正常使用的数值
+                var data = {};
+                data.left = Math.round(data_xs[0] / bl);
+                data.top = Math.round(data_xs[1] / bl);
+                data.width = Math.round(data_xs[2] / bl);
+                data.height = Math.round(data_xs[3] / bl);
+                console.log(data);
+                //3 拼接json对象,调用initImgQY方法
+                $(id).cropper("setCanvasData", { left: 0, top: 0 })
+
+                $(id).cropper("setCropBoxData", data);
+                // $(id).cropper("setCropBoxData",{"left":23,"top":134.6875,"width":258,"height":145.125});
+            }
+
+            function faceImgInit() {
+                console.log("faceImgInit........");
+                 $.ajax({
+                    url: "/getFacePic",
+                    type: "GET",
+                    async: true,
+                    timeout:5000,
+                    success: function (data) {
+                    var obj = $.parseJSON(data.data);
+                    //人脸1
+                    if (obj.pic1 != "") {
+                        if (obj.pic1.indexOf("\n") > 0) {
+                            console.log("有n")
+                            obj.pic1.replace("\n", "")
+                        }
+                        console.log(11);
+                        var img = document.getElementById("img-face1")
+                        img.src = "data:image/png; base64," + obj.pic1;
+                        console.log(1111);
+
+                    }
+                    //人脸2
+                    if (obj.pic2 != "") {
+                        if (obj.pic2.indexOf("\n") > 0) {
+                            console.log("有n")
+                            obj.pic2.replace("\n", "")
+                        }
+                        console.log(11);
+                        var imgs = document.getElementById("img-face2")
+                        imgs.src = "data:image/png; base64," + obj.pic2;
+                    }
+                    //人脸1
+                    var $face1 = $("#img-face1");
+                    $dataX1 = $('#faceX1'),
+                        $dataY1 = $('#faceY1'),
+                        $dataHeight = $('#faceH1'),
+                        $dataWidth = $('#faceW1'),
+                        $face1.cropper({
+                            background: false,
+                            modal: false,
+                            responsive: false,
+                            mouseWheelZoom: false,
+                            minContainerHeight: 480,
+                            //minCanvasHeight:410,
+                            autoCropArea: 0.3,
+                            crop: function (data) {
+                                $dataX1.val(Math.round(data.x));
+                                $dataY1.val(Math.round(data.y));
+                                $dataHeight.val(Math.round(data.height));
+                                $dataWidth.val(Math.round(data.width));
+                                if (data.height * data.width <= maxXs) {
+                                    data_face1 = $("#img-face1").cropper("getCropBoxData");
+                                    console.log(data_face1);
+                                }
+                                //data_face1 = $face1.cropper("getCropBoxData");
+                                //console.log(data_face1);
+                            },
+                            built: function () {
+                                //1 李那边获取的值放在一个数组中,分别是左上,右上,坐下,右下
+                                // var data_xs = [$dataX1.val(),$dataY1.val(),$dataWidth.val(),$dataHeight.val()];
+
+                                //a1 = [728,156,854,606];
+                                console.log(a1);
+                                initImgQY("#img-face1", a1[4], a1);
+                            }
+                        });
+                    $face1.on('dragend.cropper', function (e) {
+                        var $faceH1= $('#faceH1').val(),
+                            $faceW1 = $('#faceW1').val();
+                        if ($faceH1 * $faceW1 > maxXs) {
+                            $face1.cropper("setCropBoxData", data_face1);
+                        }
+                    });
+                    var cropper = $face1.data("cropper");
+
+                    // 人脸2
+                    var $imgface2 = $("#img-face2");
+                    $faceX2 = $('#faceX2'),
+                        $faceY2 = $('#faceY2'),
+                        $faceH2 = $('#faceH2'),
+                        $faceW2= $('#faceW2'),
+                        $imgface2.cropper({
+                            background: false,
+                            modal: false,
+                            responsive: false,
+                            mouseWheelZoom: false,
+                            minContainerHeight: 480,
+                            autoCropArea: 0.3,
+                            crop: function (data) {
+                                $faceX2.val(Math.round(data.x));
+                                $faceY2.val(Math.round(data.y));
+                                $faceH2.val(Math.round(data.height));
+                                $faceW2.val(Math.round(data.width));
+                                if (data.height * data.width <= maxXs) {
+                                    data_face2= $imgface2.cropper("getCropBoxData");
+                                    console.log(data_face2);
+                                }
+                            },
+                            built: function () {
+                                //1 李那边获取的值放在一个数组中,分别是左上,右上,坐下,右下
+                                //  var data_xs = [73,59,859,483];
+                                initImgQY("#img-face2", a2[4], a2);
+                            }
+                        });
+                    $imgface2.on('dragend.cropper', function (e) {
+                        var $faceH2 = $('#faceH2').val(),
+                            $faceW2 = $('#faceW2').val();
+                        if ($faceH2 * $faceW2 > maxXs) {
+                            $imgface2.cropper("setCropBoxData", data_face2);
+                        }
+                    });
+                    cropper_face = $imgface2.data("cropper");
+                    }
+                });
+                }
+                function carImgInit() {
+                console.log("carImgInit........");
+                $.ajax({
+                    url: host + "/getPic",
+                    type: "GET",
+                    async: true,
+                    success: function (result) {
+                    var obj = $.parseJSON(result.data);
+                    //车牌1
+                    if (obj.pic1 != "") {
+                        if (obj.pic1.indexOf("\n") > 0) {
+                            console.log("有n")
+                            obj.pic1.replace("\n", "")
+                        }
+                        console.log(11);
+                        var img = document.getElementById("img-car1")
+                        img.src = "data:image/png; base64," + obj.pic1;
+                        console.log(1111);
+
+                    }
+                    //车牌2
+                    if (obj.pic2 != "") {
+                        if (obj.pic2.indexOf("\n") > 0) {
+                            console.log("有n")
+                            obj.pic2.replace("\n", "")
+                        }
+                        console.log(11);
+                        var imgs = document.getElementById("img-car2")
+                        imgs.src = "data:image/png; base64," + obj.pic2;
+                    }
+                    //车牌1
+                    var $car1 = $("#img-car1");
+                    $carX1 = $('#carX1'),
+                        $carY1 = $('#carY1'),
+                        $carHeight = $('#carH1'),
+                        $carWidth = $('#carW1'),
+                        $car1.cropper({
+                            background: false,
+                            modal: false,
+                            responsive: false,
+                            mouseWheelZoom: false,
+                            minContainerHeight: 480,
+                            //minCanvasHeight:410,
+                            autoCropArea: 0.3,
+                            crop: function (data) {
+                                $carX1.val(Math.round(data.x));
+                                $carY1.val(Math.round(data.y));
+                                $carHeight.val(Math.round(data.height));
+                                $carWidth.val(Math.round(data.width));
+                                if (data.height * data.width <= maxXs) {
+                                    data_car1 = $car1.cropper("getCropBoxData");
+                                    console.log(data_car1);
+                                }
+                            },
+                            built: function () {
+                                //1 李那边获取的值放在一个数组中,分别是左上,右上,坐下,右下
+                                // var data_xs = [$dataX1.val(),$dataY1.val(),$dataWidth.val(),$dataHeight.val()];
+
+                                //a1 = [728,156,854,606];
+                                console.log(b1);
+                                initImgQY("#img-car1", b1[4], b1);
+                            }
+                        });
+                    $car1.on('dragend.cropper', function (e) {
+                        var $carH1= $('#carH1').val(),
+                            $carW1 = $('#carW1').val();
+                        if ($carH1 * $carW1 > maxXs) {
+                            $car1.cropper("setCropBoxData", data_car1);
+                        }
+                    });
+                    $car1.data("cropper");
+
+                    // 车牌2
+                    var $car2 = $("#img-car2");
+                    $carX2 = $('#carX2'),
+                        $carY2 = $('#carY2'),
+                        $carH2 = $('#carH2'),
+                        $carW2= $('#carW2'),
+                        $car2.cropper({
+                            background: false,
+                            modal: false,
+                            responsive: false,
+                            mouseWheelZoom: false,
+                            minContainerHeight: 480,
+                            autoCropArea: 0.3,
+                            crop: function (data) {
+                                $carX2.val(Math.round(data.x));
+                                $carY2.val(Math.round(data.y));
+                                $carH2.val(Math.round(data.height));
+                                $carW2.val(Math.round(data.width));
+                                if (data.height * data.width <= maxXs) {
+                                    data_car2= $car2.cropper("getCropBoxData");
+                                    console.log(data_car2);
+                                }
+                            },
+                            built: function () {
+                                initImgQY("#img-car2", b2[4], b2);
+                            }
+                        });
+                    $car2.on('dragend.cropper', function (e) {
+                        var $carH2 = $('#carH2').val(),
+                            $carW2 = $('#carW2').val();
+                        if ($carH2 * $carW2 > maxXs) {
+                            $car2.cropper("setCropBoxData", data_car2);
+                        }
+                    });
+                    $car2.data("cropper");
+                    }
+                });
+
+            }
+
+
+
+
+
+
+
+    </script>
+    <script type="text/javascript">
+
+            //显示图片
+            function fileReader(obj){
+                var file = obj.files;
+                var img = document.getElementById("img");
+                var reader = new FileReader();// 操作图片
+                if(/image/.test(file[0].type)){
+                    reader.readAsDataURL(file[0]);
+                }else {
+                    alert('请选择图片!');
+                    obj.value = "";
+                    return;
+                }
+                // 图片加载错误
+                reader.onerror = function(){
+                document.write("图片加载错误");
+                }
+                // 图片加载完成
+                reader.onload = function(){
+                    img.src = reader.result;
+                }
+            }
+
+
+    </script>
+</form>
+</body>
+</html>
